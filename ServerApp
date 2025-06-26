@@ -1,0 +1,116 @@
+Configuración de los Servidores de Aplicaciones
+VMs: AppServer1 (192.168.58.102 en Laptop 1) y AppServer2 (192.168.58.104 en Laptop 2).
+Objetivo: Desplegar una aplicación Node.js CRUD conectada a la base de datos y configurar un servicio FTP.
+3.1 Instalación y Configuración de la Aplicación Node.js
+Instala Node.js en ambas VMs:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo apt update && sudo apt install nodejs npm -y
+Crea un directorio para la aplicación:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+mkdir ~/myapp && cd ~/myapp
+npm init -y
+npm install express mysql2
+Crea el archivo app.js:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+nano ~/myapp/app.js
+Contenido:
+app.js
+javascript
+Mostrar esquemas alineados
+Inicia la aplicación:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+node ~/myapp/app.js
+(Para producción, usa pm2 o un servicio systemd para mantenerlo corriendo).
+3.2 Configuración del Servicio FTP
+Instala vsftpd:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo apt install vsftpd -y
+Configura vsftpd:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo nano /etc/vsftpd.conf
+Ajusta:
+text
+
+Contraer
+
+Ajuste
+
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+chroot_local_user=YES
+allow_writeable_chroot=YES
+Crea un usuario FTP:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo useradd -m ftpuser -s /bin/bash
+sudo passwd ftpuser
+Reinicia el servicio:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo systemctl restart vsftpd
+sudo systemctl enable vsftpd
+Prueba el FTP:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+ftp 192.168.58.102  # Desde otra máquina
