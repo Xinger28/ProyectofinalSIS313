@@ -1,0 +1,51 @@
+Configuración del Balanceador de Carga
+VM: LoadBalancer (192.168.58.101 en Laptop 1).
+Herramienta: NGINX.
+Objetivo: Distribuir el tráfico entre AppServer1 y AppServer2, con detección de fallos.
+Instrucciones:
+Actualiza e instala NGINX:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+Copiar
+sudo apt update && sudo apt upgrade -y
+sudo apt install nginx -y
+Configura NGINX como balanceador:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo nano /etc/nginx/nginx.conf
+Reemplaza el bloque http con:
+nginx
+
+Contraer
+
+Ajuste
+
+Copiar
+http {
+    upstream backend {
+        server 192.168.58.102:3000 max_fails=3 fail_timeout=30s; # AppServer1
+        server 192.168.58.104:3000 max_fails=3 fail_timeout=30s; # AppServer2
+    }
+    server {
+        listen 80;
+        server_name web.sis313.usfx.bo;
+        location / {
+            proxy_pass http://backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
+}
