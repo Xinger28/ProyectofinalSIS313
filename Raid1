@@ -1,0 +1,90 @@
+Configuración de Tolerancia a Fallos
+5.1 RAID (Simulación en DBServer1)
+Objetivo: Configurar RAID 1 en el servidor de base de datos maestro.
+Agrega dos discos virtuales (5 GB cada uno) en VMware para DBServer1.
+Instala mdadm:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo apt install mdadm -y
+Crea un RAID 1:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo mdadm --create --verbose /dev/md0 --level=1 --raid-devices=2 /dev/sdb /dev/sdc
+Formatea y monta:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo mkfs.ext4 /dev/md0
+sudo mkdir /mnt/raid
+sudo mount /dev/md0 /mnt/raid
+Actualiza /etc/fstab:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo nano /etc/fstab
+Agrega:
+text
+
+Contraer
+
+Ajuste
+
+
+/dev/md0 /mnt/raid ext4 defaults 0 0
+Prueba la tolerancia:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo mdadm /dev/md0 -f /dev/sdb  # Simula falla
+cat /proc/mdstat  # Verifica estado
+5.2 Tolerancia en el Balanceador
+NGINX ya está configurado con max_fails=3 fail_timeout=30s para redirigir tráfico si un servidor de aplicaciones falla.
+Prueba apagando AppServer1:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+sudo poweroff  # En AppServer1
+Verifica desde otra máquina:
+bash
+
+Contraer
+
+Ajuste
+
+Ejecutar
+
+curl http://192.168.58.101
+5.3 Tolerancia en la Base de Datos
+La replicación Maestro-Esclavo asegura que los datos estén disponibles si DBServer1 falla. Si el maestro cae, puedes promover manualmente al esclavo (esto requiere intervención manual en este caso).
